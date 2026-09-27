@@ -30,5 +30,6 @@
     <script src="{{ asset('admin/js/image-editor.js') }}?v={{ filemtime(public_path('admin/js/image-editor.js')) }}"></script>
     <script src="{{ asset('admin/js/admin.js') }}?v={{ filemtime(public_path('admin/js/admin.js')) }}"></script>
     @stack('scripts')
+    @include('partials.impersonation-bar')
 </body>
 </html>

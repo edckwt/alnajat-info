@@ -42,5 +42,6 @@
 <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 {!! Setting::get('footer_code') !!}
 @include('partials.theme-preview-bar')
+@include('partials.impersonation-bar')
 </body>
 </html>

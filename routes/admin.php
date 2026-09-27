@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Admin\MissingLinkController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\NewsOrderController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Middleware\PreventDuringImpersonation;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -59,8 +61,12 @@ Route::middleware(['auth', 'active'])->group(function () use ($crud) {
     // الملف الشخصي: لكل عضو مسجّل، بلا صلاحية خاصة
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('profile/password', [ProfileController::class, 'password'])->name('profile.password')->middleware('throttle:6,1');
-    Route::delete('profile/sessions', [ProfileController::class, 'logoutOthers'])->name('profile.sessions.destroy')->middleware('throttle:6,1');
+    Route::put('profile/password', [ProfileController::class, 'password'])->name('profile.password')->middleware(['throttle:6,1', PreventDuringImpersonation::class]);
+    Route::delete('profile/sessions', [ProfileController::class, 'logoutOthers'])->name('profile.sessions.destroy')->middleware(['throttle:6,1', PreventDuringImpersonation::class]);
+
+    // الدخول بحساب عضو بلا كلمة مرور (users.impersonate)، والعودة للحساب الأصلي (لمن دخل بحساب غيره فقط)
+    Route::post('users/{user}/impersonate', [ImpersonationController::class, 'store'])->name('users.impersonate')->middleware(['can:users.impersonate', 'throttle:20,1']);
+    Route::delete('impersonate', [ImpersonationController::class, 'destroy'])->name('impersonate.leave');
 
     // ترتيب أخبار اليوم (قبل مسارات الخبر حتى لا يُفهم «order» كرقم خبر)
     Route::get('news/order', [NewsOrderController::class, 'index'])->name('news.order')->middleware('can:news.order');

@@ -58,6 +58,12 @@
             <a href="{{ route('admin.profile.show') }}" class="dropdown-item"><x-admin.icon name="user" /><span>الملف الشخصي</span></a>
             <a href="{{ route('admin.profile.show', ['tab' => 'security']) }}" class="dropdown-item"><x-admin.icon name="lock" /><span>تغيير كلمة المرور</span></a>
             <div class="my-1.5 border-t border-line"></div>
+            @if (\App\Support\Impersonation::active())
+                <form method="POST" action="{{ route('admin.impersonate.leave') }}">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="dropdown-item w-full text-warning-600"><x-admin.icon name="login" class="flip-rtl" /><span>العودة إلى حسابي</span></button>
+                </form>
+            @endif
             <form method="POST" action="{{ route('admin.logout') }}">
                 @csrf
                 <button type="submit" class="dropdown-item dropdown-item-danger w-full">

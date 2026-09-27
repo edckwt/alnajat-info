@@ -184,6 +184,12 @@
 
         {{-- ---------------- الأمان ---------------- --}}
         <div id="tab-security" data-tab-panel @if ($tab !== 'security') hidden @endif class="grid grid-cols-12 gap-6 items-start">
+            @if (\App\Support\Impersonation::active())
+                <div class="col-span-12 alert alert-warning" role="status">
+                    <x-admin.icon name="lock" class="w-5 h-5 shrink-0" />
+                    <p>أنت داخل هذا الحساب من حساب «{{ \App\Support\Impersonation::impersonator()?->name }}»: تغيير كلمة المرور وإنهاء الجلسات غير متاحين.</p>
+                </div>
+            @endif
             <section class="col-span-12 lg:col-span-7">
                 <form method="POST" action="{{ route('admin.profile.password') }}" class="card" data-password-form>
                     @csrf @method('PUT')

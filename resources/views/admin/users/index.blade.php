@@ -37,7 +37,18 @@
                             @php($manageable = ! $user->isAdmin() || auth()->user()->isAdmin())
                             <td><x-admin.actions :edit="$manageable && auth()->user()->can('users.update') ? route('admin.users.edit', $user) : null"
                                                  :destroy="$manageable && ! auth()->user()->is($user) && auth()->user()->can('users.delete') ? route('admin.users.destroy', $user) : null"
-                                                 :confirm="'حذف العضو «'.$user->name.'»؟ أخباره تبقى.'" /></td>
+                                                 :confirm="'حذف العضو «'.$user->name.'»؟ أخباره تبقى.'">
+                                {{-- الدخول بحسابه بلا كلمة مرور (users.impersonate) --}}
+                                @if (\App\Support\Impersonation::allowed(auth()->user(), $user))
+                                    <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" data-impersonate
+                                          data-confirm="الدخول بحساب «{{ $user->name }}» دون كلمة مرور؟"
+                                          data-confirm-title="الدخول بحساب عضو" data-confirm-ok="دخول بحسابه" data-confirm-tone="warning"
+                                          data-confirm-note="ستتصفح اللوحة بصلاحياته وتُسجَّل أفعالك باسمه. للعودة إلى حسابك استخدم الشريط أسفل الصفحة.">
+                                        @csrf
+                                        <button type="submit" class="btn btn-icon btn-sm btn-ghost text-primary-600" title="الدخول بحسابه"><x-admin.icon name="login" class="w-4 h-4 flip-rtl" /></button>
+                                    </form>
+                                @endif
+                            </x-admin.actions></td>
                         </tr>
                     @endforeach
                 </tbody>
