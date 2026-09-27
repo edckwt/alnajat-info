@@ -68,7 +68,7 @@ php artisan serve        # الموقع http://localhost:8000 واللوحة htt
 
 - كل رفع ملفات بالسحب والإفلات (أو اللصق، أو النقر) مع معاينة قبل الحفظ: مكوّن `<x-admin.dropzone>`.
 - حفظ خبر بتاريخ جديد يُنشئ نشرة ذلك اليوم تلقائياً، كما كان `publications_create` يفعل.
-- الصور تُحفظ في `storage/app/public/upload` (تُعرض من `/storage/upload/…`) بنفس الأسماء والمصغّرات القديمة (`thumbs/{name}_{w}x{h}`، `{name}_thumbnail`). القيم في القاعدة تبقى `upload/…` كما في الموقع القديم، والتحويل كله في `App\Support\Media`، والروابط القديمة `/upload/…` تُحوَّل (301). النقل: `php artisan alnajat:move-uploads` (انظر DEPLOY.md).
+- الصور تُحفظ في `storage/app/public/upload` (تُعرض من `/storage/upload/…`) بنفس الأسماء والمصغّرات القديمة (`thumbs/{name}_{w}x{h}`، `{name}_thumbnail`). القيم في القاعدة تبقى `upload/…` كما في الموقع القديم، والتحويل كله في `App\Support\Media`، والروابط القديمة `/upload/…` تعمل من المجلد الجديد مباشرة (بلا تحويل). النقل: `php artisan alnajat:move-uploads` (انظر DEPLOY.md).
 - المحرر TinyMCE 7 (رخصة GPL) من jsDelivr، بواجهة عربية.
 
 ## الموقع العام

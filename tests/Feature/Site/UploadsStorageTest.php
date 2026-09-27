@@ -95,10 +95,17 @@ it('reads upload images for the PDF from the upload folder in every link form', 
         ->and(PdfBuilder::src('upload/missing.jpg'))->toBeNull();
 });
 
-it('redirects old /upload links permanently to the new place', function () {
-    $this->get('/upload/2019/news_1.png')
-        ->assertStatus(301)
-        ->assertRedirect(asset('storage/upload/2019/news_1.png'));
+it('serves old /upload links from the new folder without a redirect', function () {
+    File::ensureDirectoryExists($this->root.'/2019');
+    File::put($this->root.'/2019/news_1.png', 'png-bytes');
+    File::put($this->root.'/evil.php', '<?php echo 1;');
+
+    $response = $this->get('/upload/2019/news_1.png')->assertOk();   // 200، لا 301 (تحويل يكسر CORS)
+    expect(file_get_contents($response->baseResponse->getFile()->getPathname()))->toBe('png-bytes');
+
+    $this->get('/upload/2019/missing.png')->assertNotFound();
+    $this->get('/upload/evil.php')->assertNotFound();
+    $this->get('/upload/../.env')->assertNotFound();
 });
 
 it('copies the old upload folder with a dry run first, skipping executable files', function () {

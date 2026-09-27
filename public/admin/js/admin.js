@@ -340,7 +340,7 @@
       editCurrent.title = 'تحرير الصورة الحالية (يُرفع الناتج بدلها عند الحفظ)';
       editCurrent.addEventListener('click', function () {
         editCurrent.disabled = true;
-        fetch(currentImg.src, { credentials: 'same-origin' })
+        fetch(sameOrigin(currentImg.src), { credentials: 'same-origin' })
           .then(function (r) { if (!r.ok) throw new Error(); return r.blob(); })
           .then(function (blob) {
             var name = decodeURIComponent((currentImg.src.split('?')[0].split('/').pop()) || 'image.jpg');
@@ -362,6 +362,21 @@
       });
       var badge = current.querySelector('.badge');
       current.insertBefore(editCurrent, badge || null);
+    }
+
+    /**
+     * رابط الصورة الحالية من نفس أصل الصفحة: رابط لنفس الموقع بصيغة أخرى (www أو http/https) يُقرأ
+     * بمساره فقط، وإلا يمنعه المتصفح (CORS) ولا يمكن تحريره.
+     */
+    function sameOrigin(src) {
+      try {
+        var url = new URL(src, location.href);
+        var bare = function (h) { return h.replace(/^www\./i, '').toLowerCase(); };
+        if (url.origin !== location.origin && bare(url.hostname) === bare(location.hostname)) {
+          return location.origin + url.pathname + url.search;
+        }
+        return url.href;
+      } catch (e) { return src; }
     }
 
     function removeAt(index) {

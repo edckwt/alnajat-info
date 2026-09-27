@@ -33,12 +33,22 @@ Route::middleware([ApplySiteTheme::class, EnsureSiteIsOpen::class])->group(funct
 });
 
 /*
- * الروابط القديمة للصور والملفات /upload/… (في المواقع التي نقلت عنا، ونصوص الأخبار، والـ PDF القديمة)
- * بعد نقل المجلد إلى storage/app/public/upload: تحويل دائم إلى /storage/upload/….
- * لا يصل الطلب إلى هنا ما دام الملف موجوداً فعلاً في public/upload (يقدّمه الخادم مباشرة).
+ * الروابط القديمة للصور والملفات /upload/… (المواقع التي نقلت عنا، ونصوص الأخبار، والـ PDF القديمة)
+ * بعد نقل المجلد إلى storage/app/public/upload: يُقدَّم الملف نفسه من المجلد الجديد (200) بلا تحويل.
+ * التحويل 301 كان يكسر قراءة الصورة بـ JavaScript (تحرير الصورة الحالية) إن اختلف أصل الرابط بعد التحويل
+ * (http/https أو www خلف وكيل): «Cross-Origin Request Blocked … Status code: 301».
+ * على الخادم يقدّمها nginx مباشرة (alias في docs/DEPLOY.md)، وهذا المسار احتياط (MAMP، artisan serve).
  */
 if (config('alnajat.uploads.legacy_redirect', true) && Media::baseUrl() !== 'upload') {
-    Route::get('upload/{path}', fn (string $path) => redirect()->to(Media::url(Media::PREFIX.$path), 301))
-        ->where('path', '.+')
-        ->name('uploads.legacy');
+    Route::get('upload/{path}', function (string $path) {
+        $file = Media::path(Media::PREFIX.$path);
+        abort_unless($file !== null && is_file($file) && preg_match('/\.(jpe?g|png|gif|webp|bmp|ico|svg|pdf|docx?|mp3|m4a|wav|ogg|mp4|webm|mov)$/i', $file), 404);
+
+        $headers = ['Cache-Control' => 'public, max-age=2592000'];
+        if (str_ends_with(strtolower($file), '.svg')) {
+            $headers['Content-Security-Policy'] = "default-src 'none'; style-src 'unsafe-inline'"; // لا سكربت داخل SVG
+        }
+
+        return response()->file($file, $headers);
+    })->where('path', '.+')->name('uploads.legacy');
 }

@@ -139,9 +139,13 @@ server {
         try_files $uri =404;
     }
 
-    # الروابط القديمة للصور ← المكان الجديد (مواقع نقلت عنا، ونصوص الأخبار، والـ PDF القديمة)
+    # الروابط القديمة للصور تعمل من المكان الجديد مباشرة (مواقع نقلت عنا، ونصوص الأخبار، والـ PDF القديمة).
+    # بلا تحويل 301: التحويل قد يغيّر أصل الرابط (http/https، www) فيمنع المتصفح قراءة الصورة (CORS).
     location ^~ /upload/ {
-        rewrite ^/upload/(.*)$ /storage/upload/$1 permanent;
+        alias /var/www/alnajat/current/storage/app/public/upload/;   # بلا try_files (لا يعمل مع alias)
+        location ~* \.(php\d?|phtml|phar)$ { deny all; }
+        expires 30d;
+        access_log off;
     }
 
     location / {

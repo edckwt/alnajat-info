@@ -28,7 +28,7 @@ return [
      * وتُحوَّل هنا فقط (App\Support\Media):
      *   root: المجلد على القرص (الافتراضي storage/app/public/upload، ويُنشر بـ php artisan storage:link)
      *   url:  مساره في الموقع (الافتراضي storage/upload ← /storage/upload/…)
-     *   legacy_redirect: تحويل الروابط القديمة /upload/… إلى المكان الجديد (301).
+     *   legacy_redirect: الروابط القديمة /upload/… تعمل من المجلد الجديد (يُقدَّم الملف نفسه، بلا تحويل).
      * للرجوع إلى المجلد القديم: UPLOADS_ROOT=public/upload و UPLOADS_URL=upload
      */
     'uploads' => [
