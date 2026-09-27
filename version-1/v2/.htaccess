@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^show/([0-9a-zA-Z_-]+) index.php?action=show&id=$1 [NC,L]
+RewriteRule ^pdf-show/([0-9a-zA-Z_-]+) index.php?action=show&id=$1&read=pdf [NC,L]
+RewriteRule ^publication/([0-9a-zA-Z_-]+) index.php?action=publication&publication_id=$1 [NC,L]
+RewriteRule ^pdf-publication/([0-9a-zA-Z_-]+) index.php?action=publication&publication_id=$1&read=pdf [NC,L]
+RewriteRule ^category/([0-9a-zA-Z_-]+) index.php?action=category&id=$1 [NC,L]
+RewriteRule ^search/(.*+) index.php?action=search&s=$1 [NC,L]
+RewriteRule ^archive\.html index.php?action=publications [NC,L]
+RewriteRule ^today-news\.html index.php?read=pdf&online=1 [NC,L]

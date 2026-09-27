@@ -21,6 +21,12 @@
 /storage/*.key
 /storage/pail
 /vendor
+/upload
+/upload/*
+/version-1/v2/upload/*
+error_log
+.well-known/
+.well-known/*
 _ide_helper.php
 Homestead.json
 Homestead.yaml

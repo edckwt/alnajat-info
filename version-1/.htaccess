@@ -1,0 +1,51 @@
+Options -Indexes
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^show/([0-9a-zA-Z_-]+) index.php?action=show&id=$1 [NC,L]
+RewriteRule ^pdf-show/([0-9a-zA-Z_-]+) index.php?action=show&id=$1&read=pdf [NC,L]
+RewriteRule ^publication/([0-9a-zA-Z_-]+) index.php?action=publication&publication_id=$1 [NC,L]
+RewriteRule ^pdf-publication/([0-9a-zA-Z_-]+) index.php?action=publication&publication_id=$1&read=pdf [NC,L]
+RewriteRule ^category/([0-9a-zA-Z_-]+) index.php?action=category&id=$1 [NC,L]
+RewriteRule ^search/(.*+) index.php?action=search&s=$1 [NC,L]
+RewriteRule ^archive\.html index.php?action=publications [NC,L]
+RewriteRule ^today-news\.html index.php?read=pdf&online=1 [NC,L]
+
+# BEGIN cPanel-generated php ini directives, do not edit
+# Manual editing of this file may result in unexpected behavior.
+# To make changes to this file, use the cPanel MultiPHP INI Editor (Home >> Software >> MultiPHP INI Editor)
+# For more information, read our documentation (https://go.cpanel.net/EA4ModifyINI)
+<IfModule php8_module>
+   php_flag display_errors Off
+   php_value max_execution_time 30
+   php_value max_input_time 60
+   php_value max_input_vars 1000
+   php_value memory_limit 128M
+   php_value post_max_size 8M
+   php_value session.gc_maxlifetime 1440
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php83"
+   php_value upload_max_filesize 50M
+   php_flag zlib.output_compression Off
+</IfModule>
+<IfModule lsapi_module>
+   php_flag display_errors Off
+   php_value max_execution_time 30
+   php_value max_input_time 60
+   php_value max_input_vars 1000
+   php_value memory_limit 128M
+   php_value post_max_size 8M
+   php_value session.gc_maxlifetime 1440
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php83"
+   php_value upload_max_filesize 50M
+   php_flag zlib.output_compression Off
+</IfModule>
+# END cPanel-generated php ini directives, do not edit
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php83” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php83 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
