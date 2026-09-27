@@ -103,7 +103,12 @@
 <footer class="footer">
     <div class="wrap footer-in">
         <div class="footer-brand">
-            <span class="brand-mark sm" aria-hidden="true">{{ mb_substr((string) $siteName, 0, 1) }}</span>
+              @if ($logo)
+                <img class="brand-logo" src="{{ $logo }}" alt="" width="56" height="56">
+            @else
+                <span class="brand-mark sm" aria-hidden="true">{{ mb_substr((string) $siteName, 0, 1) }}</span>
+            @endif
+            
             <span>{{ $siteName }}@if (filled($slogan)) — {{ $slogan }}@endif</span>
         </div>
         <nav class="footer-links" aria-label="روابط التذييل">
