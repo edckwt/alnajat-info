@@ -12,7 +12,6 @@
     $sameDay ??= collect();
     $dayPublication ??= null;
     $paper = $news->newspaper;
-    $paperLogo = Media::thumb($paper?->logo, 'small');
     $shareUrl = route('news.show', $news->id);
     $shareText = rawurlencode($news->title);
     $shareUrlEnc = rawurlencode($shareUrl);
@@ -36,10 +35,15 @@
             <header class="article-head">
                 <div class="tags">
                     @foreach ($news->categories as $category)<a class="tag tag-primary" href="{{ route('category.show', $category->id) }}">{{ $category->name }}</a>@endforeach
-                    @if ($paper)<span class="tag">{{ $paper->name }}</span>@endif
                     @if ($news->published_date)<a class="tag" href="{{ route('home', ['date' => $news->published_date->toDateString()]) }}">{{ ArabicDate::long($news->published_date) }}</a>@endif
                 </div>
                 <h1>{{ $news->title }}</h1>
+                @if ($paper)
+                    <div class="article-source">
+                        @include('site.partials.paper', ['paper' => $paper, 'size' => 'lg', 'label' => 'المصدر'])
+                        @if (filled($news->newspaper_number) && trim((string) $news->newspaper_number) !== '0')<span class="article-source-issue">العدد {{ $news->newspaper_number }}</span>@endif
+                    </div>
+                @endif
                 @if ($desc !== '' && $desc !== trim($news->title))
                     <p class="lead">{{ $desc }}</p>
                 @endif
@@ -55,9 +59,6 @@
                     <a href="{{ Media::url($news->image) }}" target="_blank" title="عرض الصورة بالحجم الكامل">
                         <img src="{{ Media::url($news->image) }}" alt="{{ $news->title }}">
                     </a>
-                    @if ($paper && ($paperLogo && (string) \App\Models\Setting::get('newspaper_name') !== '1'))
-                        <span class="paper-badge"><img src="{{ $paperLogo }}" alt="{{ $paper->name }}"></span>
-                    @endif
                 </figure>
             @endif
 

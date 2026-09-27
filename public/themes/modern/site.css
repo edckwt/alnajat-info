@@ -270,6 +270,35 @@ button { font: inherit; cursor: pointer; }
 .empty h2 { font-size: 22px; }
 .empty p { color: var(--muted); }
 
+/* ---------- شعار الجريدة (مصدر الخبر): site/partials/paper ---------- */
+.paper { display: inline-flex; align-items: center; gap: 8px; min-width: 0; color: var(--ink-2); font-weight: 600; }
+.paper img { display: block; width: auto; object-fit: contain; }
+.paper.has-logo img { background: #fff; border: 1px solid var(--line-soft); border-radius: 8px; padding: 3px 6px; box-sizing: content-box; }
+.paper-sm img { height: 22px; max-width: 92px; }
+.paper-md img { height: 28px; max-width: 120px; }
+.paper-lg img { height: 44px; max-width: 170px; padding: 6px 10px; border-radius: 12px; }
+.paper-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.paper-lg .paper-name { font-weight: 700; color: var(--ink); }
+.paper-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.nc-meta { align-items: center; }
+.nc-mini .nc-meta { margin-top: 4px; }
+.badge-paper .paper img { border: 0; padding: 0; }
+.nc-caption .paper { flex-shrink: 0; }
+.article-source { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 16px; background: #fff; border: 1px solid var(--line); border-radius: 16px; align-self: flex-start; }
+.article-source .paper.has-logo img { border: 0; padding: 0; }
+.article-source-issue { font-size: 14px; color: var(--muted); padding-inline-start: 16px; border-inline-start: 1px solid var(--line); }
+
+/* ---------- تبديل العرض في القسم: شبكي | قائمة ---------- */
+.page-head.page-head-row { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.page-head-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.view-switch { display: inline-flex; padding: 4px; gap: 4px; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+.view-switch a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 10px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.view-switch a:hover { color: var(--primary); }
+.view-switch a.is-active { background: var(--primary); color: #fff; }
+.news-list { display: flex; flex-direction: column; gap: 16px; }
+.news-list .nc-row { grid-template-columns: 280px minmax(0, 1fr); }
+.news-list .nc-row .nc-media { min-height: 180px; }
+
 /* ---------- الصفحات الداخلية ---------- */
 .crumbs { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 32px; font-size: 14px; color: var(--muted); }
 .crumbs a { color: var(--muted); }
@@ -398,6 +427,12 @@ body.closed { min-height: 100vh; display: grid; place-items: center; padding: 24
   .nc-row { grid-template-columns: 110px minmax(0, 1fr); }
   .nc-row .nc-media { min-height: 110px; }
   .nc-row .nc-body { padding: 12px 14px; }
+  .news-list .nc-row { grid-template-columns: 120px minmax(0, 1fr); }
+  .news-list .nc-row .nc-media { min-height: 120px; }
+  .view-switch a span { display: none; }
+  .view-switch a { padding: 8px 10px; }
+  .paper-lg img { height: 36px; }
+  .paper-md.has-logo .paper-name { display: none; }
   .nc-row .nc-excerpt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; }
   .nc-clip .nc-body { padding: 10px 12px 12px; }
   .nc-clip .nc-title { font-size: 14px; }

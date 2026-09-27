@@ -1,5 +1,6 @@
 {{--
     بطاقة خبر. $post، $variant: card | lead | row | clip | figure | mini، $full (الوصف كاملاً)، $showDate.
+    مصدر الخبر يظهر بشعار الجريدة (site.partials.paper) في كل الأشكال.
     خبر بلا نص حقيقي (قصاصة أو إنفوجرافيك عنوانه «خبر» أو «تغريدة 1») يُعرض كصورة: card → clip، lead → figure.
 --}}
 @php
@@ -17,7 +18,8 @@
     }
     $showDate ??= false;
     $url = route('news.show', $post->id);
-    $paper = $post->newspaper?->name;
+    $newspaper = $post->newspaper;
+    $paper = $newspaper?->name;
     $isProject = (int) $post->type === 5 && filled($post->source_url);
     $image = match ($variant) {
         'mini' => Media::thumb($post->image, 'xsmall'),
@@ -34,24 +36,24 @@
         @if (! $weakTitle || $paper)
             <div class="nc-body nc-caption">
                 @unless ($weakTitle)<h3 class="nc-title"><a href="{{ $url }}">{{ $title }}</a></h3>@endunless
-                @if ($paper)<span class="nc-meta">{{ $paper }}</span>@endif
+                @if ($newspaper)@include('site.partials.paper', ['paper' => $newspaper, 'size' => 'sm', 'label' => null])@endif
             </div>
         @endif
     @elseif ($variant === 'mini')
         <a class="nc-mini-link" href="{{ $url }}">
             @if ($image)<img src="{{ $image }}" alt="" loading="lazy" width="64" height="64">@else<span class="nc-mini-ph ph" aria-hidden="true"></span>@endif
-            <span class="nc-mini-text"><span class="nc-mini-title">{{ $post->title }}</span>@if ($paper)<span class="nc-meta">{{ $paper }}</span>@endif</span>
+            <span class="nc-mini-text"><span class="nc-mini-title">{{ $post->title }}</span>@if ($newspaper)<span class="nc-meta">@include('site.partials.paper', ['paper' => $newspaper, 'size' => 'sm', 'label' => null])</span>@endif</span>
         </a>
     @else
         <a class="nc-media {{ $image ? '' : 'ph' }}" href="{{ $url }}" tabindex="-1" aria-hidden="true">
             @if ($image)<img src="{{ $image }}" alt="" loading="lazy">@endif
-            @if ($paper && $variant === 'clip')<span class="badge-paper">{{ $paper }}</span>@endif
+            @if ($newspaper && $variant === 'clip')<span class="badge-paper">@include('site.partials.paper', ['paper' => $newspaper, 'size' => 'sm', 'label' => null])</span>@endif
         </a>
         <div class="nc-body">
             @if ($variant !== 'clip' && ($paper || $showDate))
                 <div class="nc-meta">
-                    @if ($paper)<span>{{ $paper }}</span>@endif
-                    @if ($showDate && $post->published_date)<span>{{ ArabicDate::long($post->published_date) }}</span>@endif
+                    @if ($newspaper)@include('site.partials.paper', ['paper' => $newspaper, 'size' => $variant === 'card' ? 'sm' : 'md', 'label' => null])@endif
+                    @if ($showDate && $post->published_date)<span class="nc-date">{{ ArabicDate::long($post->published_date) }}</span>@endif
                 </div>
             @endif
             @if (! ($weakTitle && $variant === 'clip'))
