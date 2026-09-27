@@ -326,7 +326,7 @@ a.tag:hover { border-color: var(--primary); color: var(--primary); }
 .issue-hero-text { display: flex; flex-direction: column; gap: 18px; }
 .issue-hero-text h1 { font-size: clamp(26px, 3.4vw, 40px); font-weight: 800; }
 
-.pager-wrap { margin-top: 32px; }
+.pager-wrap { margin-top: 15px; margin-bottom: 15px;}
 .pager { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
 .pager-pages { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .pager-btn, .pager-num { min-width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; padding-inline: 14px; border-radius: 12px; background: #fff; border: 1px solid var(--line); color: var(--ink-2); font-weight: 700; }
