@@ -24,6 +24,7 @@
 /upload
 /upload/*
 /version-1/v2/upload/*
+/version-1/*.zip
 error_log
 .well-known/
 .well-known/*
