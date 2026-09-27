@@ -97,6 +97,23 @@ final class PdfDesign
         return $this->design;
     }
 
+    /** @return list<string> كل مسارات الصور في التصميم (الخلفيات، خلفيات الأقسام، عناصر الصور) */
+    public function imagePaths(): array
+    {
+        $paths = [];
+        foreach ($this->design['pages'] as $page) {
+            $paths[] = $page['background']['image'] ?? null;
+            foreach ($page['categoryBackgrounds'] ?? [] as $image) {
+                $paths[] = $image;
+            }
+            foreach ($page['elements'] as $el) {
+                $paths[] = $el['src'] ?? null;
+            }
+        }
+
+        return array_values(array_unique(array_filter($paths, fn ($p) => is_string($p) && $p !== '')));
+    }
+
     /** @return array{0: float, 1: float} العرض والارتفاع بالمليمتر */
     public static function size(string $format, string $orientation): array
     {

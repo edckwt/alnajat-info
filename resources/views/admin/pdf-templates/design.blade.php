@@ -32,6 +32,8 @@
         </style>
     @endpush
 
+    @include('admin.pdf-templates._assets-alert', ['templates' => [$template]])
+
     <div class="designer" data-designer>
         <script type="application/json" data-designer-design>@json($design)</script>
         <script type="application/json" data-designer-config>@json($config)</script>

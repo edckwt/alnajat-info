@@ -5,6 +5,7 @@
         @endcan
     </x-admin.page-header>
     <x-admin.errors />
+    @include('admin.pdf-templates._assets-alert', ['templates' => $templates])
 
     <section class="space-y-4">
         <h2 class="text-lg font-extrabold">القوالب المصمَّمة</h2>

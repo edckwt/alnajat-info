@@ -73,6 +73,12 @@ php artisan storage:link   # public/storage ← storage/app/public (الصور �
 php artisan alnajat:assets --copy
 ```
 
+**تنبيه:** محلياً `public/css` و`public/js` و`public/images` (وقد يكون `resources/fonts`) روابط رمزية إلى مجلد
+الموقع القديم على الجهاز. إن رُفع المشروع كما هو إلى الخادم صارت روابط مكسورة واختفت صور القوالب والنشرة؛
+`--copy` يحذف هذه الروابط ويضع نسخاً حقيقية. للفحص فقط: `php artisan alnajat:assets --check`
+(ويظهر التنبيه نفسه في صفحة «قوالب النشرة» في اللوحة). صور القوالب المرفوعة من الجهاز المحلي
+(`upload/pdf-template_…`) ليست في مجلد الموقع القديم على الخادم: انسخها إلى `storage/app/public/upload`.
+
 ينسخ `css` و`js` و`images` إلى `public/`، والخطوط إلى `resources/fonts`، والصور `upload` إلى
 `storage/app/public/upload` عبر `alnajat:move-uploads` (يستبعد ملفات PHP و`.htaccess`، ويكمل الناقص
 عند إعادته، ويتحقق من مسارات القاعدة). تُعرض الصور من `/storage/upload/…`، والقيم في القاعدة تبقى `upload/…`.

@@ -1,6 +1,7 @@
 <x-admin.layout title="قالب جديد" :breadcrumb="['قوالب النشرة' => route('admin.pdf-templates.index'), 'قالب جديد' => null]">
     <x-admin.page-header title="قالب نشرة جديد" :back="route('admin.pdf-templates.index')" back-label="عودة للقوالب" />
     <x-admin.errors />
+    @include('admin.pdf-templates._assets-alert', ['templates' => collect()])
 
     <form method="POST" action="{{ route('admin.pdf-templates.store') }}" class="space-y-6">
         @csrf

@@ -204,3 +204,30 @@ it('really renders a designed publication with mPDF', function () {
     expect($pdf)->toStartWith('%PDF')
         ->and(substr_count($pdf, '/Type /Page'))->toBeGreaterThanOrEqual(3); // غلاف + صفحة خبر + ختام
 })->skip(fn () => ! class_exists(\Mpdf\Mpdf::class), 'mPDF غير مثبت');
+
+it('warns when template images are missing on this server', function () {
+    $root = sys_get_temp_dir().'/alnajat-up-root-'.uniqid();
+    File::ensureDirectoryExists($root);
+    File::put($root.'/here.png', 'x');
+    config(['alnajat.uploads.root' => $root]);
+
+    $template = PdfTemplate::forceCreate(['name' => 'قالب الخادم', 'status' => 'draft', 'design' => PdfDesign::fromArray([
+        'pages' => [
+            'cover' => ['background' => ['image' => 'upload/not-on-server.jpg'], 'elements' => [['type' => 'image', 'src' => 'upload/here.png', 'x' => 1, 'y' => 1, 'w' => 10, 'h' => 10]]],
+            'section' => ['categoryBackgrounds' => ['1' => 'images/v9/missing-section.jpg']],
+        ],
+    ])->toArray()]);
+
+    expect($template->toDesign()->imagePaths())->toEqualCanonicalizing(['upload/not-on-server.jpg', 'upload/here.png', 'images/v9/missing-section.jpg'])
+        ->and(array_keys(\App\Support\AssetCheck::missingTemplateImages([$template])))
+        ->toEqualCanonicalizing(['upload/not-on-server.jpg', 'images/v9/missing-section.jpg']);
+
+    $this->get(route('admin.pdf-templates.index'))->assertOk()
+        ->assertSee('data-assets-alert', false)
+        ->assertSee('upload/not-on-server.jpg')
+        ->assertSee('alnajat:assets --copy');
+
+    $this->get(route('admin.pdf-templates.edit', $template))->assertOk()->assertSee('upload/not-on-server.jpg');
+
+    File::deleteDirectory($root);
+});
