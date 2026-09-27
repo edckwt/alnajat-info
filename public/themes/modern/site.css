@@ -78,7 +78,9 @@ button { font: inherit; cursor: pointer; }
 .masthead-in { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 24px 18px; }
 .brand { display: flex; align-items: center; gap: 16px; color: var(--ink); min-width: 0; }
 .brand:hover { color: var(--ink); }
-.brand-logo { width: auto; height: 56px; max-width: 160px; object-fit: contain; }
+.brand-logo { width: auto; height: 56px; max-width: 160px; object-fit: contain;background: white;
+  padding: 0.3rem;
+  border-radius: 0.4rem; }
 .brand-mark { width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; background: var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 800 26px/1 var(--font-head); }
 .brand-mark.sm { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
 .brand-text { display: flex; flex-direction: column; min-width: 0; }
