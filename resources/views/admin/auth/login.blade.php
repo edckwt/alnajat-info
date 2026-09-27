@@ -7,11 +7,8 @@
 <body class="auth-body">
 <div class="auth-shell">
     <aside class="auth-aside">
-        <div class="flex items-center gap-3 relative z-10">
-            <span class="w-10 h-10 rounded-2xl bg-white/15 grid place-items-center shrink-0">
-                <x-admin.icon name="logo" class="w-5 h-5" />
-            </span>
-            <span class="font-extrabold text-xl">{{ __('admin.brand') }}</span>
+        <div class="relative z-10">
+            <x-admin.logo size="lg" icon="w-10 h-10 rounded-2xl bg-white/15" text="font-extrabold text-xl" />
         </div>
 
         <div class="relative z-10 max-w-sm">
@@ -37,11 +34,8 @@
         </div>
 
         <div class="auth-card">
-            <div class="lg:hidden flex items-center gap-3 mb-8">
-                <span class="w-10 h-10 rounded-2xl bg-primary-600 text-white grid place-items-center shrink-0">
-                    <x-admin.icon name="logo" class="w-5 h-5" />
-                </span>
-                <span class="font-extrabold text-xl">{{ __('admin.brand') }}</span>
+            <div class="lg:hidden mb-8">
+                <x-admin.logo size="lg" :chip="true" icon="w-10 h-10 rounded-2xl bg-primary-600 text-white" text="font-extrabold text-xl" />
             </div>
 
             <h1 class="text-2xl font-extrabold">{{ __('admin.login.welcome') }}</h1>

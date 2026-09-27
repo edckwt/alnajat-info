@@ -29,14 +29,27 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::table('publications', function (Blueprint $table) {
-            $table->foreignId('pdf_template_id')->nullable()->after('pdf_version')->constrained('pdf_templates')->nullOnDelete();
+        // على SQLite (الاختبارات) إضافة قيد مفتاح أجنبي لجدول موجود تعني إعادة بناء الجدول، وLaravel يقرأ أعمدته
+        // بـ pragma_table_xinfo() التي لا تدعمها نسخ SQLite القديمة في بعض توزيعات PHP (مثل MAMP):
+        // «near "(": syntax error». فيُضاف العمود وحده هناك، والقيد على MySQL كما هو. الحذف محمي في
+        // PdfTemplateController::destroy (لا يُحذف قالب مستخدم)، فلا يتغير السلوك.
+        $sqlite = Schema::getConnection()->getDriverName() === 'sqlite';
+
+        Schema::table('publications', function (Blueprint $table) use ($sqlite) {
+            $column = $table->foreignId('pdf_template_id')->nullable()->after('pdf_version');
+            if (! $sqlite) {
+                $column->constrained('pdf_templates')->nullOnDelete();
+            }
         });
     }
 
     public function down(): void
     {
-        Schema::table('publications', fn (Blueprint $table) => $table->dropConstrainedForeignId('pdf_template_id'));
+        Schema::table('publications', function (Blueprint $table) {
+            Schema::getConnection()->getDriverName() === 'sqlite'
+                ? $table->dropColumn('pdf_template_id')
+                : $table->dropConstrainedForeignId('pdf_template_id');
+        });
         Schema::dropIfExists('pdf_templates');
     }
 };

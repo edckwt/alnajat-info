@@ -8,9 +8,9 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Throwable;
 
 /**
  * ينقل مجلد الصور القديم (public/upload، وقد يكون رابطاً لمجلد الموقع القديم) إلى مجلد الرفع الجديد
@@ -218,10 +218,12 @@ class MoveUploads extends Command
         $rows = [];
         $total = $found = 0;
         foreach ($columns as [$table, $column]) {
-            if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
-                continue;
+            try {
+                // بلا Schema::hasColumn: على SQLite القديم يعتمد على pragma_table_xinfo() غير المدعومة
+                $paths = DB::table($table)->where($column, 'like', Media::PREFIX.'%')->pluck($column);
+            } catch (Throwable) {
+                continue; // جدول أو عمود غير موجود
             }
-            $paths = DB::table($table)->where($column, 'like', Media::PREFIX.'%')->pluck($column);
             $exists = $paths->filter(fn ($p) => is_file($root.'/'.substr($p, strlen(Media::PREFIX))))->count();
             $missing = $paths->count() - $exists;
             $total += $paths->count();

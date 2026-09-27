@@ -625,6 +625,26 @@
   [data-layout='mini'] .app-sidebar .nav-link { @apply lg:justify-center lg:px-0; }
   [data-layout='mini'] .app-sidebar .nav-group > .nav-sub { @apply lg:hidden; }
 
+  /* ------------------------------ شعار الموقع (الإعدادات ← الشعار) ------------------------------
+     <x-admin.logo>: الشعار غالباً نص أبيض، فيظهر مباشرة على القائمة الملونة/الداكنة وعلى جانب صفحة الدخول،
+     وداخل «شريحة» بلون الثيم في الأماكن الفاتحة (is-chip، والقائمة الفاتحة). */
+  .brand-logo { @apply inline-flex items-center max-w-full; }
+  .brand-logo img { @apply block w-auto max-w-full object-contain; }
+  .brand-logo-sm img { @apply h-7 max-w-[8.5rem]; }
+  .brand-logo-md img { @apply h-10 max-w-[10rem]; }
+  .brand-logo-lg img { @apply h-14 max-w-[16rem]; }
+  .brand-logo.is-chip,
+  :root[data-sidebar='light'] .app-sidebar .brand-logo {
+    @apply rounded-xl px-3 py-1.5 shadow-sm;
+    background-image: linear-gradient(135deg, rgb(var(--c-primary-600)), rgb(var(--c-primary-800)));
+  }
+  .brand-logo-sm.is-chip { @apply px-2.5 py-1 rounded-lg; }
+  .brand-logo-lg.is-chip { @apply px-4 py-2.5 rounded-2xl; }
+  /* القائمة المصغّرة: مربع من طرف الشعار (الرمز في جهة البداية) */
+  [data-layout='mini'] .app-sidebar .sidebar-brand { @apply lg:px-0 lg:justify-center; }
+  [data-layout='mini'] .app-sidebar .brand-logo img { @apply lg:w-10 lg:h-10 lg:object-cover; object-position: right center; }
+  [data-layout='mini'] .app-sidebar .brand-logo { @apply lg:p-1; }
+
   /* الجوال */
   @media (max-width: 1023.98px) {
     .app-sidebar { transform: translateX(var(--sidebar-off)); box-shadow: none; }

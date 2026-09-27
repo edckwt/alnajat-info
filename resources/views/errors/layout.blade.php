@@ -2,6 +2,7 @@
 @php
     $inPanel = request()->is('cp', 'cp/*');
     $home = $inPanel ? url('cp') : url('/');
+    $logo = $inPanel ? \App\Support\Brand::logoUrl() : null;
 @endphp
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -24,10 +25,13 @@
         a { display: inline-block; background: var(--brand); color: #fff; text-decoration: none;
             font-weight: 700; padding: 12px 24px; border-radius: 12px; }
         a:focus-visible { outline: 3px solid #E09F3E; outline-offset: 2px; }
+        .logo { display: inline-block; background: var(--brand); padding: 8px 14px; border-radius: 14px; margin: 0 0 24px; }
+        .logo img { display: block; height: 40px; width: auto; max-width: 220px; object-fit: contain; }
     </style>
 </head>
 <body>
 <main>
+    @if ($logo)<span class="logo"><img src="{{ $logo }}" alt="{{ \App\Support\Brand::name() }}"></span>@endif
     <p class="code">@yield('code')</p>
     <h1>@yield('title')</h1>
     <p>@yield('message')</p>

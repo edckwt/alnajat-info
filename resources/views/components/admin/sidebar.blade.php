@@ -21,11 +21,10 @@
     ];
 @endphp
 <aside class="app-sidebar" id="appSidebar">
-    <div class="flex items-center gap-3 h-[var(--header-h)] px-5 shrink-0">
-        <span class="w-9 h-9 rounded-xl bg-sidebar-ink/15 grid place-items-center text-sidebar-ink shrink-0">
-            <x-admin.icon name="logo" class="w-5 h-5" />
-        </span>
-        <span class="brand-text font-extrabold text-lg text-sidebar-ink">{{ __('admin.brand') }}</span>
+    <div class="sidebar-brand flex items-center h-[var(--header-h)] px-5 shrink-0">
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center min-w-0" aria-label="{{ __('admin.nav.dashboard') }}">
+            <x-admin.logo size="md" icon="w-9 h-9 rounded-xl bg-sidebar-ink/15 text-sidebar-ink" text="font-extrabold text-lg text-sidebar-ink" />
+        </a>
     </div>
 
     <nav class="flex-1 overflow-y-auto scroll-thin px-3 pb-6">

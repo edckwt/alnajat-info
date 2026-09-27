@@ -5,6 +5,11 @@
         <x-admin.icon name="menu" />
     </button>
 
+    {{-- الشعار على الجوال (القائمة الجانبية مخفية) --}}
+    <a href="{{ route('admin.dashboard') }}" class="lg:hidden shrink-0" aria-label="{{ __('admin.nav.dashboard') }}">
+        <x-admin.logo size="sm" :chip="true" icon="w-8 h-8 rounded-lg bg-primary-600 text-white" text="font-extrabold text-base hidden sm:inline" />
+    </a>
+
     <nav class="breadcrumb hidden sm:flex">
         <a href="{{ route('admin.dashboard') }}">{{ __('admin.panel') }}</a>
         @foreach ($breadcrumb as $label => $url)
