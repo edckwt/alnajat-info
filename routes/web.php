@@ -9,6 +9,7 @@ use App\Http\Controllers\Site\SearchController;
 use App\Http\Middleware\ApplySiteTheme;
 use App\Http\Middleware\EnsureSiteIsOpen;
 use App\Http\Middleware\RedirectLegacyUrls;
+use App\Support\Media;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,3 +31,14 @@ Route::middleware([ApplySiteTheme::class, EnsureSiteIsOpen::class])->group(funct
     Route::get('pdf-publication/{id}', [PdfController::class, 'publication'])->whereNumber('id')->name('publication.pdf');
     Route::get('today-news.html', [PdfController::class, 'today'])->name('pdf.today');
 });
+
+/*
+ * الروابط القديمة للصور والملفات /upload/… (في المواقع التي نقلت عنا، ونصوص الأخبار، والـ PDF القديمة)
+ * بعد نقل المجلد إلى storage/app/public/upload: تحويل دائم إلى /storage/upload/….
+ * لا يصل الطلب إلى هنا ما دام الملف موجوداً فعلاً في public/upload (يقدّمه الخادم مباشرة).
+ */
+if (config('alnajat.uploads.legacy_redirect', true) && Media::baseUrl() !== 'upload') {
+    Route::get('upload/{path}', fn (string $path) => redirect()->to(Media::url(Media::PREFIX.$path), 301))
+        ->where('path', '.+')
+        ->name('uploads.legacy');
+}

@@ -61,8 +61,9 @@ REDIS_CLIENT=phpredis
 الصلاحيات:
 
 ```bash
-sudo chown -R $USER:www-data storage bootstrap/cache public/upload
-sudo chmod -R ug+rwX storage bootstrap/cache public/upload
+sudo chown -R $USER:www-data storage bootstrap/cache
+sudo chmod -R ug+rwX storage bootstrap/cache
+php artisan storage:link   # public/storage ← storage/app/public (الصور المرفوعة في storage/app/public/upload)
 ```
 
 ## 3) الملفات القديمة
@@ -72,7 +73,19 @@ sudo chmod -R ug+rwX storage bootstrap/cache public/upload
 php artisan alnajat:assets --copy
 ```
 
-ينسخ `css` و`js` و`images` و`upload` إلى `public/`، والخطوط إلى `resources/fonts`.
+ينسخ `css` و`js` و`images` إلى `public/`، والخطوط إلى `resources/fonts`، والصور `upload` إلى
+`storage/app/public/upload` عبر `alnajat:move-uploads` (يستبعد ملفات PHP و`.htaccess`، ويكمل الناقص
+عند إعادته، ويتحقق من مسارات القاعدة). تُعرض الصور من `/storage/upload/…`، والقيم في القاعدة تبقى `upload/…`.
+
+لنقل مجلد موجود أصلاً في `public/upload` (مثل بيئة سابقة):
+
+```bash
+php artisan alnajat:move-uploads --dry-run   # العدد والحجم والمساحة الحرة والتعارضات، بلا نسخ
+php artisan alnajat:move-uploads             # نسخ (المصدر يبقى)، أو --move لنقل وحذف من المصدر
+rm -r public/upload                          # بعد التأكد فقط: تعمل بعدها تحويلات /upload/… ← /storage/upload/…
+```
+
+للرجوع إلى المجلد القديم بلا تعديل كود: `UPLOADS_ROOT=public/upload` و`UPLOADS_URL=upload` في `.env` ثم `php artisan config:cache`.
 
 ## 4) Nginx
 
@@ -112,10 +125,17 @@ server {
         try_files $uri =404;
     }
 
-    # لا تنفيذ PHP داخل مجلد الرفع أبداً
-    location ^~ /upload/ {
-        location ~ \.php$ { deny all; }
+    # الصور المرفوعة (storage/app/public عبر الرابط public/storage): لا تنفيذ PHP أبداً
+    location ^~ /storage/ {
+        location ~* \.(php\d?|phtml|phar)$ { deny all; }
+        expires 30d;
+        access_log off;
         try_files $uri =404;
+    }
+
+    # الروابط القديمة للصور ← المكان الجديد (مواقع نقلت عنا، ونصوص الأخبار، والـ PDF القديمة)
+    location ^~ /upload/ {
+        rewrite ^/upload/(.*)$ /storage/upload/$1 permanent;
     }
 
     location / {
@@ -178,7 +198,7 @@ Cron لـ `www-data` (`sudo crontab -u www-data -e`):
 ```bash
 # /etc/cron.d/alnajat-backup
 30 3 * * * root mysqldump --single-transaction alnajat | gzip > /var/backups/alnajat/db-$(date +\%F).sql.gz && find /var/backups/alnajat -name 'db-*.sql.gz' -mtime +30 -delete
-45 3 * * 0 root tar czf /var/backups/alnajat/upload-$(date +\%F).tgz -C /var/www/alnajat/current/public upload
+45 3 * * 0 root tar czf /var/backups/alnajat/upload-$(date +\%F).tgz -C /var/www/alnajat/current/storage/app/public upload
 ```
 
 ملفات `storage/app/pdf` لا تحتاج نسخاً: تُولَّد عند الطلب.

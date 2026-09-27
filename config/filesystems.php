@@ -47,12 +47,12 @@ return [
             'report' => false,
         ],
 
-        // مجلد upload/ القديم كما هو داخل public/upload، حتى تبقى كل روابط
-        // الصور المحفوظة داخل نصوص الأخبار صالحة.
+        // الصور والملفات المرفوعة (upload/… في القاعدة). نفس إعداد alnajat.uploads:
+        // storage/app/public/upload ويُعرض من /storage/upload بعد php artisan storage:link.
         'uploads' => [
             'driver' => 'local',
-            'root' => public_path('upload'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/upload',
+            'root' => ($uploadsRoot = (string) env('UPLOADS_ROOT', '')) === '' ? storage_path('app/public/upload') : (str_starts_with($uploadsRoot, '/') ? $uploadsRoot : base_path($uploadsRoot)),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/'.trim((string) env('UPLOADS_URL', 'storage/upload'), '/'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

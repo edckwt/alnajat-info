@@ -53,7 +53,11 @@
   }
   function assetUrl(path) {
     if (!path) return '';
-    return /^https?:\/\//i.test(path) ? path : config.urls.asset + '/' + path.replace(/^\/+/, '');
+    if (/^https?:\/\//i.test(path)) return path;
+    path = path.replace(/^\/+/, '');
+    // المرفوعات تبقى «upload/…» في التصميم، وملفها في مجلد الرفع (/storage/upload/…)
+    if (config.urls.uploads && path.indexOf('upload/') === 0) return config.urls.uploads + '/' + path.slice(7);
+    return config.urls.asset + '/' + path;
   }
   function fill(text) {
     return String(text || '').replace(/\{\{\s*([a-z_]+)\s*\}\}/g, function (_, k) {

@@ -6,6 +6,7 @@
             'preview' => route('admin.pdf-templates.preview', $template),
             'upload' => route('admin.pdf-templates.upload', $template),
             'asset' => rtrim(asset(''), '/'),
+            'uploads' => rtrim(asset(\App\Support\Media::baseUrl()), '/'),
         ],
         'fonts' => collect($fonts)->map(fn ($label, $key) => ['key' => $key, 'label' => $label, 'url' => route('admin.pdf-templates.font', $key)])->values(),
         'variables' => $variables,

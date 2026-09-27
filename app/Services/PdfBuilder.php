@@ -361,13 +361,13 @@ class PdfBuilder
         return $this->localizeUrls(file_get_contents($file));
     }
 
-    /** url({site_url}images/x.png) → مسار الملف في public/، وإن لم يوجد تُلغى الخلفية (none) بدل طلبها من الموقع. */
+    /** url({site_url}images/x.png) → مسار الملف على القرص (public/ أو مجلد الرفع)، وإن لم يوجد تُلغى الخلفية (none) بدل طلبها من الموقع. */
     public function localizeUrls(string $css): string
     {
         return (string) preg_replace_callback('/url\(\s*([\'"]?)\{site_url\}([^)\'"\s?]+)(\?[^)\'"\s]*)?\1\s*\)/', function ($m) {
-            $local = public_path($m[2]);
+            $local = self::src($m[2]);
 
-            return is_file($local) ? 'url("'.$local.'")' : 'none';
+            return $local !== null ? 'url("'.$local.'")' : 'none';
         }, $css);
     }
 
@@ -403,9 +403,20 @@ class PdfBuilder
         $relative = $isUrl ? (string) parse_url(str_starts_with($path, '//') ? 'http:'.$path : $path, PHP_URL_PATH) : $path;
         $relative = ltrim(rawurldecode((string) strtok($relative, '?#')), '/');
 
+        // المرفوعات (upload/… أو /storage/upload/… أو رابطها القديم /upload/…) من مجلد الرفع،
+        // ثم public/ (ملفات الموقع images/ css/، أو مرفوعات لم تُنقل بعد إلى المجلد الجديد).
+        $base = Media::baseUrl().'/';
         foreach (array_unique([$relative, preg_replace('#^.*?/?((?:upload|images|css)/.+)$#', '$1', $relative)]) as $candidate) {
-            if ($candidate !== '' && is_file($local = public_path($candidate))) {
-                return $local;
+            if ($candidate === '') {
+                continue;
+            }
+            if (str_starts_with($candidate, $base)) {
+                $candidate = Media::PREFIX.substr($candidate, strlen($base));
+            }
+            foreach ([Media::path($candidate), public_path($candidate)] as $local) {
+                if ($local !== null && is_file($local)) {
+                    return $local;
+                }
             }
         }
 

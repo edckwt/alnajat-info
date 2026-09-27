@@ -18,7 +18,8 @@ php artisan migrate
 php artisan legacy:import --fresh
 php artisan legacy:verify
 
-# 4) ملفات الموقع القديم: css، js، images، upload → public/، والخطوط → resources/fonts
+# 4) ملفات الموقع القديم: css، js، images → public/، والخطوط → resources/fonts،
+#    والصور upload → storage/app/public/upload (ويُنشأ public/storage)
 php artisan alnajat:assets          # روابط رمزية (محلياً)، أو --copy على الخادم
 
 # 5) الاختبارات
@@ -67,7 +68,7 @@ php artisan serve        # الموقع http://localhost:8000 واللوحة htt
 
 - كل رفع ملفات بالسحب والإفلات (أو اللصق، أو النقر) مع معاينة قبل الحفظ: مكوّن `<x-admin.dropzone>`.
 - حفظ خبر بتاريخ جديد يُنشئ نشرة ذلك اليوم تلقائياً، كما كان `publications_create` يفعل.
-- الصور تُحفظ في `public/upload` بنفس الأسماء والمصغّرات القديمة (`thumbs/{name}_{w}x{h}`، `{name}_thumbnail`).
+- الصور تُحفظ في `storage/app/public/upload` (تُعرض من `/storage/upload/…`) بنفس الأسماء والمصغّرات القديمة (`thumbs/{name}_{w}x{h}`، `{name}_thumbnail`). القيم في القاعدة تبقى `upload/…` كما في الموقع القديم، والتحويل كله في `App\Support\Media`، والروابط القديمة `/upload/…` تُحوَّل (301). النقل: `php artisan alnajat:move-uploads` (انظر DEPLOY.md).
 - المحرر TinyMCE 7 (رخصة GPL) من jsDelivr، بواجهة عربية.
 
 ## الموقع العام

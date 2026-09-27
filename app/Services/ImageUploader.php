@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -9,14 +10,14 @@ use Intervention\Image\ImageManager;
 use Throwable;
 
 /**
- * يحفظ الصور بنفس أسلوب النظام القديم (upload_files في includes/function.php)
- * حتى يبقى الموقع العام والـ PDF يجدان الصور ومصغّراتها في نفس الأماكن:
+ * يحفظ الصور بنفس أسلوب النظام القديم (upload_files في includes/function.php) وأسمائه،
+ * في مجلد الرفع Media::root() (الافتراضي storage/app/public/upload، ويُعرض من /storage/upload):
  *
- *   public/upload/{prefix}_{time}_{random15}.{ext}                الأصل
- *   public/upload/thumbs/{name}_{w}x{h}.{ext}                    قصّ لكل مقاس في crop()
- *   public/upload/{name}_thumbnail.{ext}                         عرض 200 بنفس النسبة
+ *   {root}/{prefix}_{time}_{random15}.{ext}                      الأصل
+ *   {root}/thumbs/{name}_{w}x{h}.{ext}                           قصّ لكل مقاس في crop()
+ *   {root}/{name}_thumbnail.{ext}                                عرض 200 بنفس النسبة
  *
- * ويعيد المسار النسبي 'upload/...' الذي يُحفظ في قاعدة البيانات.
+ * ويعيد المسار النسبي 'upload/...' الذي يُحفظ في قاعدة البيانات (كما في الموقع القديم).
  */
 class ImageUploader
 {
@@ -24,9 +25,13 @@ class ImageUploader
 
     public function store(UploadedFile $file, string $prefix = 'news'): string
     {
-        $root = $this->root ?? public_path('upload');
+        $root = rtrim($this->root ?? Media::root(), '/');
         $extension = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'jpg');
         $name = $prefix.'_'.time().'_'.Str::random(15);
+
+        if (! is_dir($root)) {
+            mkdir($root, 0755, true);
+        }
 
         $file->move($root, $name.'.'.$extension);
 

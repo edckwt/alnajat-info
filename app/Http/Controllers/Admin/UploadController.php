@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Upload;
 use App\Services\ImageUploader;
+use App\Support\Media;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -51,9 +52,14 @@ class UploadController extends Controller
 
     public function destroy(Upload $upload): RedirectResponse
     {
-        // يُحذف السجل فقط إن كان الملف خارج مجلد upload/؛ وإلا يُحذف الملف أيضاً.
-        if (str_starts_with($upload->path, 'upload/')) {
-            File::delete(public_path($upload->path));
+        // يُحذف السجل فقط إن كان الملف خارج مجلد upload/؛ وإلا يُحذف الملف ومصغّراته أيضاً.
+        if ($file = Media::path($upload->path)) {
+            $info = pathinfo($file);
+            File::delete([
+                $file,
+                $info['dirname'].'/'.$info['filename'].'_thumbnail.'.($info['extension'] ?? ''),
+                ...glob($info['dirname'].'/thumbs/'.$info['filename'].'_*x*.'.($info['extension'] ?? '')) ?: [],
+            ]);
         }
 
         $upload->delete();

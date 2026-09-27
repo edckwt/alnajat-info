@@ -23,6 +23,20 @@ return [
     // نسبي = من جذر المشروع.
     'legacy_path' => str_starts_with($legacy = (string) env('LEGACY_PATH', '../alnajatinfo'), '/') ? $legacy : base_path($legacy),
 
+    /*
+     * مكان الصور والملفات المرفوعة. القيم في قاعدة البيانات تبقى «upload/…» كما في الموقع القديم،
+     * وتُحوَّل هنا فقط (App\Support\Media):
+     *   root: المجلد على القرص (الافتراضي storage/app/public/upload، ويُنشر بـ php artisan storage:link)
+     *   url:  مساره في الموقع (الافتراضي storage/upload ← /storage/upload/…)
+     *   legacy_redirect: تحويل الروابط القديمة /upload/… إلى المكان الجديد (301).
+     * للرجوع إلى المجلد القديم: UPLOADS_ROOT=public/upload و UPLOADS_URL=upload
+     */
+    'uploads' => [
+        'root' => rtrim(($root = (string) env('UPLOADS_ROOT', '')) === '' ? storage_path('app/public/upload') : (str_starts_with($root, '/') ? $root : base_path($root)), '/'),
+        'url' => trim((string) env('UPLOADS_URL', 'storage/upload'), '/'),
+        'legacy_redirect' => (bool) env('UPLOADS_LEGACY_REDIRECT', true),
+    ],
+
     // النطاقات التي تُحذف من بداية روابط الصور القديمة لتصبح نسبية.
     'legacy_hosts' => array_values(array_filter(array_map(
         'trim',

@@ -35,8 +35,9 @@ php artisan legacy:import --fresh --force
 step "4) التحقق (يتوقف السكربت إن وُجد أي فرق)"
 php artisan legacy:verify
 
-step "5) آخر الصور المرفوعة في الموقع القديم"
+step "5) آخر الصور المرفوعة في الموقع القديم (← storage/app/public/upload)"
 php artisan alnajat:assets --copy
+test -L public/storage || php artisan storage:link
 
 step "6) التهيئة وتجهيز آخر النشرات"
 php artisan optimize
