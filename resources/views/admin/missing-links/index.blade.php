@@ -12,8 +12,12 @@
     <div class="card">
         <form method="GET" class="card-body flex flex-wrap items-center gap-3">
             <div class="relative flex-1 min-w-56">
-                <input type="search" name="q" value="{{ request('q') }}" class="form-input" dir="ltr" placeholder="ابحث في الرابط…">
+                <input type="search" name="q" value="{{ request('q') }}" class="form-input" dir="ltr" placeholder="ابحث في الرابط أو IP…">
             </div>
+            @if ($ip)
+                <input type="hidden" name="ip" value="{{ $ip }}">
+                <a href="{{ request()->fullUrlWithoutQuery(['ip', 'page']) }}" class="badge badge-primary gap-1.5" title="إلغاء التصفية">IP: <span dir="ltr">{{ $ip }}</span> <x-admin.icon name="x" class="w-3 h-3" /></a>
+            @endif
             <select name="sort" class="form-select w-auto" onchange="this.form.submit()">
                 <option value="hits" @selected($sort === 'hits')>الأكثر طلباً</option>
                 <option value="recent" @selected($sort === 'updated_at')>الأحدث</option>
@@ -23,7 +27,7 @@
 
         <div class="table-wrap">
             <table class="table table-hover">
-                <thead><tr class="border-b border-line"><th>الرابط</th><th class="text-center">مرات الطلب</th><th>جاء من</th><th>أول مرة</th><th>آخر مرة</th><th class="text-center">حذف</th></tr></thead>
+                <thead><tr class="border-b border-line"><th>الرابط</th><th class="text-center">مرات الطلب</th><th>جاء من</th><th>IP (آخر طلب)</th><th>أول مرة</th><th>آخر مرة</th><th class="text-center">حذف</th></tr></thead>
                 <tbody>
                     @forelse ($links as $link)
                         <tr>
@@ -32,12 +36,19 @@
                             </td>
                             <td class="text-center font-bold">{{ number_format($link->hits) }}</td>
                             <td class="max-w-xs text-sm text-muted break-all" dir="ltr">{{ $link->referer ?: '—' }}</td>
+                            <td class="text-sm whitespace-nowrap" dir="ltr">
+                                @if ($link->ip)
+                                    <a href="{{ request()->fullUrlWithQuery(['ip' => $link->ip, 'page' => null]) }}" class="font-mono text-ink hover:text-primary-600 hover:underline" title="كل الروابط من هذا العنوان">{{ $link->ip }}</a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                             <td class="text-muted text-sm whitespace-nowrap">{{ $link->created_at?->format('Y-m-d H:i') }}</td>
                             <td class="text-muted text-sm whitespace-nowrap">{{ $link->updated_at?->format('Y-m-d H:i') }}</td>
                             <td><x-admin.actions :destroy="auth()->user()->can('missing_links.delete') ? route('admin.missing-links.destroy', $link) : null" confirm="حذف هذا الرابط من القائمة؟" /></td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-center text-muted py-10">لا توجد روابط مفقودة.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-10">لا توجد روابط مفقودة.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -17,12 +17,17 @@ class MissingLinkController extends Controller
 
         return view('admin.missing-links.index', [
             'links' => MissingLink::query()
-                ->when($request->filled('q'), fn ($q) => $q->where('path', 'like', '%'.$request->query('q').'%'))
+                ->when($request->filled('q'), function ($query) use ($request) {
+                    $term = '%'.$request->query('q').'%';
+                    $query->where(fn ($w) => $w->where('path', 'like', $term)->orWhere('ip', 'like', $term));
+                })
+                ->when($request->filled('ip'), fn ($query) => $query->where('ip', $request->query('ip')))
                 ->orderByDesc($sort)
                 ->orderByDesc('id')
                 ->paginate(50)
                 ->withQueryString(),
             'sort' => $sort,
+            'ip' => $request->query('ip'),
             'total' => MissingLink::count(),
             'today' => MissingLink::where('updated_at', '>=', now()->startOfDay())->count(),
         ]);

@@ -20,6 +20,28 @@ it('records every 404 once and counts repeat visits', function () {
         ->and(MissingLink::count())->toBe(2);
 });
 
+it('keeps the ip of the last visitor of each missing link and shows it in the panel', function () {
+    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])->get('old-page')->assertNotFound();
+    expect(MissingLink::where('path', '/old-page')->value('ip'))->toBe('203.0.113.7');
+
+    $this->withServerVariables(['REMOTE_ADDR' => '2001:db8::1'])->get('old-page')->assertNotFound();
+    $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.4'])->get('other-page')->assertNotFound();
+
+    $link = MissingLink::where('path', '/old-page')->sole();
+    expect($link->ip)->toBe('2001:db8::1')->and($link->hits)->toBe(2);
+
+    $this->actingAs($this->admin)->get(route('admin.missing-links.index'))->assertOk()
+        ->assertSee('IP (آخر طلب)')
+        ->assertSee('2001:db8::1')
+        ->assertSee('198.51.100.4');
+
+    // التصفية بعنوان واحد، والبحث يشمل IP
+    $this->get(route('admin.missing-links.index', ['ip' => '198.51.100.4']))->assertOk()
+        ->assertSee('/other-page')->assertDontSee('/old-page');
+    $this->get(route('admin.missing-links.index', ['q' => '2001:db8']))->assertOk()
+        ->assertSee('/old-page')->assertDontSee('/other-page');
+});
+
 it('does not record the control panel or working pages', function () {
     $this->get('/')->assertOk();
     $this->actingAs($this->admin)->get('cp/no-such-page')->assertNotFound();
