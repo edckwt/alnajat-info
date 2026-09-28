@@ -42,6 +42,18 @@ it('keeps the ip of the last visitor of each missing link and shows it in the pa
         ->assertSee('/old-page')->assertDontSee('/other-page');
 });
 
+it('takes the real visitor ip behind Cloudflare, and ignores a spoofed header from anyone else', function () {
+    // من خوادم Cloudflare: العنوان الحقيقي من X-Forwarded-For
+    $this->withServerVariables(['REMOTE_ADDR' => '173.245.48.10', 'HTTP_X_FORWARDED_FOR' => '203.0.113.50'])
+        ->get('via-cloudflare')->assertNotFound();
+    expect(MissingLink::where('path', '/via-cloudflare')->value('ip'))->toBe('203.0.113.50');
+
+    // مباشرة من عنوان آخر: الترويسة لا يُوثق بها
+    $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.23', 'HTTP_X_FORWARDED_FOR' => '1.2.3.4'])
+        ->get('direct-hit')->assertNotFound();
+    expect(MissingLink::where('path', '/direct-hit')->value('ip'))->toBe('198.51.100.23');
+});
+
 it('does not record the control panel or working pages', function () {
     $this->get('/')->assertOk();
     $this->actingAs($this->admin)->get('cp/no-such-page')->assertNotFound();

@@ -93,6 +93,12 @@ rm -r public/upload                          # بعد التأكد فقط: تع�
 
 للرجوع إلى المجلد القديم بلا تعديل كود: `UPLOADS_ROOT=public/upload` و`UPLOADS_URL=upload` في `.env` ثم `php artisan config:cache`.
 
+**خلف Cloudflare:** `bootstrap/app.php` يثق بترويسات Cloudflare (عنوان الزائر الحقيقي و https) فقط إذا جاء الطلب
+من نطاقاتها المذكورة في `app/Support/Cloudflare.php` (أو من وكيل محلي 127.0.0.1)، فيظهر IP الزائر في «روابط مفقودة» وفي السجلات.
+
+**لا تشغّل `php artisan test` على الخادم بعد `php artisan optimize`:** مع إعدادات مخزّنة (config cache) تستخدم الاختبارات
+قاعدة الإنتاج، و`RefreshDatabase` يمسحها. شغّلها محلياً، أو نفّذ `php artisan config:clear` قبلها.
+
 ## 4) Nginx
 
 `/etc/nginx/sites-available/alnajat`:

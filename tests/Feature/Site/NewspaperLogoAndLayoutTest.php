@@ -48,6 +48,7 @@ it('lets the visitor switch the category between grid (default) and list, and re
         ->assertSee('view-switch', false)
         ->assertSee('nc nc-card', false)
         ->assertDontSee('nc nc-row', false);
+    $this->get('category/1?view=weird')->assertOk()->assertSee('nc nc-card', false); // قيمة غير معروفة = الشبكي
 
     $this->get('category/1?view=list')->assertOk()
         ->assertSee('news-list', false)
@@ -57,6 +58,6 @@ it('lets the visitor switch the category between grid (default) and list, and re
     // الاختيار محفوظ في الكوكي للزيارة التالية
     $this->withCookie(CategoryController::LAYOUT_COOKIE, 'list')->get('category/1')->assertOk()->assertSee('nc nc-row', false);
 
+    // ?view يغلب الكوكي المحفوظ (withCookie يبقى مع كل الطلبات التالية في الاختبار)
     $this->get('category/1?view=grid')->assertOk()->assertSee('nc nc-card', false)->assertCookie(CategoryController::LAYOUT_COOKIE, 'grid');
-    $this->get('category/1?view=weird')->assertOk()->assertSee('nc nc-card', false);
 });

@@ -28,7 +28,15 @@ final class LegacyTransform
         private readonly int $pdfLatestVersion,
         private readonly string $timezone = 'Asia/Kuwait',
     ) {
-        $hosts = array_map(fn ($h) => preg_quote(strtolower(trim($h)), '#'), $legacyHosts);
+        // كل نطاق بصيغتيه (مع www وبدونها) حتى لو ذُكرت واحدة فقط في LEGACY_HOSTS
+        $hosts = [];
+        foreach ($legacyHosts as $host) {
+            $host = preg_replace('#^www\.#', '', strtolower(trim((string) $host)));
+            if ($host !== '') {
+                array_push($hosts, preg_quote($host, '#'), preg_quote('www.'.$host, '#'));
+            }
+        }
+        $hosts = array_values(array_unique($hosts));
         $this->hostPattern = $hosts === []
             ? '#^$#'
             : '#^https?://(?:'.implode('|', $hosts).')/+#i';

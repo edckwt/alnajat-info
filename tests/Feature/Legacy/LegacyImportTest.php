@@ -71,6 +71,12 @@ function runImport(PDO $legacy): App\Legacy\ImportReport
     return (new LegacyImporter($legacy, DB::connection()->getPdo(), app(LegacyTransform::class)))->run(fresh: true);
 }
 
+beforeEach(function () {
+    // نطاقات الموقع القديم ثابتة هنا، لا من LEGACY_HOSTS في .env الخادم الذي تُشغَّل عليه الاختبارات
+    config(['alnajat.legacy_hosts' => ['alnajat.info', 'www.alnajat.info']]);
+    $this->app->forgetInstance(LegacyTransform::class);
+});
+
 it('copies every row and keeps the ids', function () {
     runImport(legacyDatabase());
 
