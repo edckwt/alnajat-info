@@ -161,4 +161,30 @@ return [
         // دقائق قبل أن يُعاد توليد PDF «أخبار اليوم» ولو لم يتغير شيء.
         'today_ttl' => 15,
     ],
+
+    /*
+     * حظر العناوين (App\Support\Firewall). القيم هنا افتراضية؛ المصيدة والاستثناءات والحد تُعدَّل من
+     * اللوحة («حظر العناوين») وتُحفظ في الإعدادات. FIREWALL_ALLOW في .env لا تُحظر أبداً مهما كان
+     * (منفذ النجاة إن حُظر عنوانك): عناوين أو نطاقات CIDR مفصولة بفواصل.
+     */
+    'firewall' => [
+        'enabled' => (bool) env('FIREWALL_ENABLED', true),
+        'allow' => array_values(array_filter(array_map('trim', explode(',', (string) env('FIREWALL_ALLOW', ''))))),
+        // أجزاء روابط لا يطلبها زائر حقيقي أبداً؛ أي طلب يحتوي أحدها يُحظر عنوانه فوراً
+        'trap_paths' => [
+            '/.git', '.git-credentials', '/.env', '/.svn', '/.hg', '/.aws', '/.ssh', 'id_rsa', '/.ds_store',
+            '/.vscode', '/.idea', 'wp-login.php', '/wp-admin', '/wp-includes', '/wp-content', 'xmlrpc.php',
+            'phpmyadmin', '/pma/', '/adminer', 'phpunit', 'eval-stdin.php', '/cgi-bin/', '/etc/passwd',
+            '../', '/storage/logs', 'docker-compose', '/.htpasswd', '/server-status',
+            '/actuator', '/boaform', 'wlwmanifest.xml', 'config.php.bak',
+            '/backup.zip', '/backup.sql', '/dump.sql', '/db.sql',
+        ],
+        // حدّ الصفحات غير الموجودة: هذا العدد خلال هذه الدقائق = حظر (لا تُحتسب الصور والملفات الثابتة)
+        'not_found_limit' => 30,
+        'not_found_minutes' => 5,
+        // مدة الحظر بالدقائق حسب مرات التكرار: يوم، ثم أسبوع، ثم شهر (لكل ما بعدها)
+        'durations' => [1440, 10080, 43200],
+        // بعد هذه الأيام من آخر حظر يبدأ العدّ من جديد
+        'strike_reset_days' => 90,
+    ],
 ];

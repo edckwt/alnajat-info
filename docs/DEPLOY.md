@@ -99,6 +99,11 @@ rm -r public/upload                          # بعد التأكد فقط: تع�
 **لا تشغّل `php artisan test` على الخادم بعد `php artisan optimize`:** مع إعدادات مخزّنة (config cache) تستخدم الاختبارات
 قاعدة الإنتاج، و`RefreshDatabase` يمسحها. شغّلها محلياً، أو نفّذ `php artisan config:clear` قبلها.
 
+**حظر العناوين (`/cp/firewall`):** يُحظر تلقائياً من يطلب روابط مصيدة (`/.git`، `/.env`، `wp-login.php` …) أو 30 صفحة
+غير موجودة خلال 5 دقائق؛ يوم ثم أسبوع ثم شهر عند التكرار. ضع عنوان المكتب في الاستثناءات من اللوحة، أو في `.env`:
+`FIREWALL_ALLOW=203.0.113.7,198.51.100.0/24` (يبقى مستثنى مهما كان). إن حُظر عنوانك ولم تستطع دخول اللوحة:
+`php artisan firewall:unblock 203.0.113.7` (أو `--list` لعرض المحظورين، `--all` لرفع الكل). للإيقاف الطارئ: `FIREWALL_ENABLED=false`.
+
 ## 4) Nginx
 
 `/etc/nginx/sites-available/alnajat`:

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\Firewall;
 use App\Http\Middleware\SecurityHeaders;
 use App\Models\MissingLink;
 use App\Support\Cloudflare;
@@ -30,6 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // خلف Cloudflare: عنوان الزائر الحقيقي (request()->ip()) و https من ترويساتها، ولا نثق بها إلا منها
         $middleware->trustProxies(at: Cloudflare::trustedProxies());
 
+        // حظر العناوين المتلصصة (المصيدة والعناوين المحظورة) قبل أي عمل آخر، بعد معرفة IP الزائر
+        $middleware->append(Firewall::class);
+
         $middleware->redirectGuestsTo(fn (Request $request) => route('admin.login'));
         $middleware->redirectUsersTo(fn (Request $request) => route('admin.dashboard'));
 
@@ -41,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // كل 404 يُسجَّل في «روابط مفقودة» ثم تُعرض صفحة الخطأ المعتادة.
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             MissingLink::record($request);
+            \App\Support\Firewall::recordNotFound($request); // صفحات غير موجودة كثيرة خلال دقائق = حظر
 
             return null;
         });

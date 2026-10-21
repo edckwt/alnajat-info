@@ -45,6 +45,18 @@
                             <td class="text-sm whitespace-nowrap" dir="ltr">
                                 @if ($link->ip)
                                     <a href="{{ request()->fullUrlWithQuery(['ip' => $link->ip, 'page' => null]) }}" class="font-mono text-ink hover:text-primary-600 hover:underline" title="كل الروابط من هذا العنوان">{{ $link->ip }}</a>
+                                    {{-- حظر العنوان من هنا مباشرة (حظر العناوين) --}}
+                                    @if (\App\Support\Firewall::isBlocked($link->ip))
+                                        <span class="badge badge-danger ms-1">محظور</span>
+                                    @elseif (auth()->user()->can('firewall.create') && ! \App\Support\Firewall::isAllowed($link->ip) && $link->ip !== request()->ip())
+                                        <form method="POST" action="{{ route('admin.firewall.store') }}" class="inline" data-confirm="حظر {{ $link->ip }} يوماً كاملاً؟" data-confirm-title="حظر عنوان" data-confirm-ok="حظر"
+                                              data-confirm-tone="danger" data-confirm-note="لن يستطيع هذا العنوان فتح الموقع ولا اللوحة. يُرفع الحظر من «حظر العناوين».">
+                                            @csrf
+                                            <input type="hidden" name="ip" value="{{ $link->ip }}"><input type="hidden" name="duration" value="1440">
+                                            <input type="hidden" name="note" value="من روابط مفقودة: {{ \Illuminate\Support\Str::limit($link->path, 200) }}">
+                                            <button type="submit" class="btn btn-sm btn-ghost text-danger-600 !px-2 ms-1" title="حظر هذا العنوان"><x-admin.icon name="shield" class="w-4 h-4" /></button>
+                                        </form>
+                                    @endif
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif

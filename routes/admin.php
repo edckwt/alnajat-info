@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FirewallController;
 use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Admin\MissingLinkController;
 use App\Http\Controllers\Admin\NewsController;
@@ -109,6 +110,13 @@ Route::middleware(['auth', 'active'])->group(function () use ($crud) {
     Route::get('missing-links/export', [MissingLinkController::class, 'export'])->name('missing-links.export')->middleware(['can:missing_links.view', 'throttle:10,1']);
     Route::delete('missing-links', [MissingLinkController::class, 'clear'])->name('missing-links.clear')->middleware('can:missing_links.delete');
     Route::delete('missing-links/{missingLink}', [MissingLinkController::class, 'destroy'])->name('missing-links.destroy')->middleware('can:missing_links.delete');
+
+    // حظر العناوين (App\Support\Firewall)
+    Route::get('firewall', [FirewallController::class, 'index'])->name('firewall.index')->middleware('can:firewall.view');
+    Route::post('firewall', [FirewallController::class, 'store'])->name('firewall.store')->middleware('can:firewall.create');
+    Route::put('firewall/settings', [FirewallController::class, 'settings'])->name('firewall.settings')->middleware('can:firewall.settings');
+    Route::patch('firewall/{blockedIp}/unblock', [FirewallController::class, 'unblock'])->name('firewall.unblock')->middleware('can:firewall.delete');
+    Route::delete('firewall/{blockedIp}', [FirewallController::class, 'destroy'])->name('firewall.destroy')->middleware('can:firewall.delete');
 });
 
 // روابط اللوحة القديمة (cp/index.php?action=...) تذهب إلى الرئيسية الجديدة.

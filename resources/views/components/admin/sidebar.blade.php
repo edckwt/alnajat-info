@@ -13,11 +13,12 @@
         ['route' => 'admin.newspapers.index', 'icon' => 'paper', 'label' => __('admin.nav.newspapers'), 'can' => ['newspapers.view']],
         ['route' => 'admin.banners.index', 'icon' => 'image', 'label' => __('admin.nav.banners'), 'can' => ['banners.view']],
         ['route' => 'admin.uploads.index', 'icon' => 'upload', 'label' => __('admin.nav.uploads'), 'can' => ['uploads.view']],
-        ['section' => __('admin.nav.system'), 'can' => ['users.view', 'roles.view', 'settings.general', 'settings.home', 'settings.pdf', 'settings.pdf_boxes', 'missing_links.view']],
+        ['section' => __('admin.nav.system'), 'can' => ['users.view', 'roles.view', 'settings.general', 'settings.home', 'settings.pdf', 'settings.pdf_boxes', 'missing_links.view', 'firewall.view']],
         ['route' => 'admin.users.index', 'icon' => 'users', 'label' => __('admin.nav.users'), 'can' => ['users.view']],
         ['route' => 'admin.roles.index', 'icon' => 'user', 'label' => __('admin.nav.roles'), 'can' => ['roles.view']],
         ['route' => 'admin.settings.edit', 'icon' => 'gear', 'label' => __('admin.nav.settings'), 'can' => ['settings.general', 'settings.home', 'settings.pdf', 'settings.pdf_boxes']],
         ['route' => 'admin.missing-links.index', 'icon' => 'link', 'label' => __('admin.nav.missing_links'), 'can' => ['missing_links.view']],
+        ['route' => 'admin.firewall.index', 'icon' => 'shield', 'label' => __('admin.nav.firewall'), 'can' => ['firewall.view']],
     ];
 @endphp
 <aside class="app-sidebar" id="appSidebar">
