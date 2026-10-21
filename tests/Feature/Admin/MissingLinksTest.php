@@ -78,3 +78,33 @@ it('lists, deletes and clears missing links for admins only', function () {
         'password' => 'secret-123', 'role' => 'editor', 'is_active' => true]);
     $this->actingAs($editor)->get(route('admin.missing-links.index'))->assertForbidden();
 });
+
+it('exports the missing links as csv with the current search and filter', function () {
+    $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.7'])->get('old-page')->assertNotFound();
+    $this->get('old-page')->assertNotFound();
+    $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.4'])->withHeader('referer', '=HYPERLINK("x")')->get('other-page')->assertNotFound();
+
+    $response = $this->actingAs($this->admin)->get(route('admin.missing-links.export'))->assertOk();
+    expect($response->headers->get('content-type'))->toContain('text/csv')
+        ->and($response->headers->get('content-disposition'))->toContain('missing-links-');
+
+    $csv = $response->streamedContent();
+    $rows = array_map(fn ($line) => str_getcsv($line, escape: ''), array_filter(explode("\n", trim(substr($csv, 3)))));
+
+    expect(substr($csv, 0, 3))->toBe("\xEF\xBB\xBF")                          // Excel يفتحه بالعربية
+        ->and($rows[0])->toBe(['الرابط', 'الرابط الكامل', 'مرات الطلب', 'جاء من', 'IP (آخر طلب)', 'أول مرة', 'آخر مرة'])
+        ->and($rows)->toHaveCount(3)
+        ->and($rows[1][0])->toBe('/old-page')->and($rows[1][2])->toBe('2')     // الأكثر طلباً أولاً
+        ->and($rows[2][3])->toBe("'=HYPERLINK(\"x\")")                       // لا صيغة تُنفَّذ في Excel
+        ->and($rows[2][4])->toBe('198.51.100.4');
+
+    // نفس التصفية المعروضة
+    $filtered = $this->get(route('admin.missing-links.export', ['ip' => '198.51.100.4']))->streamedContent();
+    expect($filtered)->toContain('/other-page')->not->toContain('/old-page');
+
+    $this->get(route('admin.missing-links.index'))->assertSee(route('admin.missing-links.export'), false);
+
+    $editor = User::forceCreate(['name' => 'محرر', 'username' => 'editor2', 'email' => 'editor2@example.com',
+        'password' => 'secret-123', 'role' => 'editor', 'is_active' => true]);
+    $this->actingAs($editor)->get(route('admin.missing-links.export'))->assertForbidden();
+});

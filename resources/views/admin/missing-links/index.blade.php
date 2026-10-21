@@ -1,6 +1,12 @@
 <x-admin.layout title="روابط مفقودة" :breadcrumb="['روابط مفقودة' => null]">
     <x-admin.page-header title="روابط مفقودة (404)"
                          :subtitle="'روابط طلبها الزوار ولم تُوجد. '.number_format($total).' رابطاً، منها '.number_format($today).' طُلب اليوم.'">
+        @if ($total > 0)
+            {{-- نفس البحث والتصفية والترتيب الظاهرة، كل الصفحات --}}
+            <a href="{{ route('admin.missing-links.export', request()->only(['q', 'ip', 'sort'])) }}" class="btn btn-secondary gap-2" title="تصدير القائمة بالبحث والتصفية الحالية">
+                <x-admin.icon name="upload" class="w-4 h-4 rotate-180" /> تصدير CSV
+            </a>
+        @endif
         @if ($total > 0 && auth()->user()->can('missing_links.delete'))
             <form method="POST" action="{{ route('admin.missing-links.clear') }}" data-confirm="تفريغ قائمة الروابط المفقودة كلها؟" data-confirm-title="تفريغ القائمة" data-confirm-ok="تفريغ">
                 @csrf @method('DELETE')

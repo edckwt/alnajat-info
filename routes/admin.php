@@ -106,6 +106,7 @@ Route::middleware(['auth', 'active'])->group(function () use ($crud) {
     Route::get('settings/fonts/{font}', [SettingController::class, 'font'])->where('font', '[a-z0-9-]+')->name('settings.font')->middleware('can:settings.pdf');
 
     Route::get('missing-links', [MissingLinkController::class, 'index'])->name('missing-links.index')->middleware('can:missing_links.view');
+    Route::get('missing-links/export', [MissingLinkController::class, 'export'])->name('missing-links.export')->middleware(['can:missing_links.view', 'throttle:10,1']);
     Route::delete('missing-links', [MissingLinkController::class, 'clear'])->name('missing-links.clear')->middleware('can:missing_links.delete');
     Route::delete('missing-links/{missingLink}', [MissingLinkController::class, 'destroy'])->name('missing-links.destroy')->middleware('can:missing_links.delete');
 });
